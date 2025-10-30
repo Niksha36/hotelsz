@@ -1,6 +1,8 @@
 # compose.yml
 services:
   php:
+    volumes:
+      - ./:/var/www/html
     build:
       context: .
       dockerfile: docker/php/Dockerfile
