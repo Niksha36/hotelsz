@@ -2,22 +2,22 @@
 
 namespace App\Infrastructure\Persistence;
 
-use App\Repository\CSVRepository;
+use App\Repository\CSVRepositoryInterface;
 
-class CSVRepositoryImpl implements CSVRepository
+class CSVRepository implements CSVRepositoryInterface
 {
-    private string $projectDir;
+    private string $csvDirectory;
 
-    public function __construct(string $projectDir)
+    public function __construct(string $csvDirectory)
     {
-        $this->projectDir = $projectDir;
+        $this->csvDirectory = $csvDirectory;
     }
     private function buildPath(string $filename): string
     {
         if (pathinfo($filename, PATHINFO_EXTENSION) === '') {
             $filename .= '.csv';
         }
-        return $this->projectDir . '/assets/csv/' . $filename;
+        return $this->csvDirectory . '/' . $filename;
     }
 
     public function read(string $filename): array

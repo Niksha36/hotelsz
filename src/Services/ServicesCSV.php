@@ -2,13 +2,13 @@
 
 namespace App\Services;
 
-use App\Repository\CSVRepository;
+use App\Repository\CSVRepositoryInterface;
 
 class ServicesCSV
 {
-    private CsvRepository $csvRepository;
+    private CSVRepositoryInterface $csvRepository;
 
-    public function __construct(CsvRepository $csvRepository)
+    public function __construct(CSVRepositoryInterface $csvRepository)
     {
         $this->csvRepository = $csvRepository;
     }

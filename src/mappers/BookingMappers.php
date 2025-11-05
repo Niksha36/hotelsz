@@ -2,6 +2,8 @@
 
 namespace  App\mappers;
 use App\dto\BookingRequestDto;
+use DateTimeImmutable;
+use DateTimeInterface;
 
 final class BookingMappers
 {
@@ -13,13 +15,13 @@ final class BookingMappers
 
         if (!empty($data['created_at'])) {
             try {
-                $createdAt = new \DateTimeImmutable($data['created_at']);
+                $createdAt = new DateTimeImmutable($data['created_at']);
             } catch (\Exception $e) {
                 // лучше не скрывать ошибки — здесь делаем fallback, но можно и оставить null и позволить валидатору/логике обработать
-                $createdAt = new \DateTimeImmutable();
+                $createdAt = new DateTimeImmutable();
             }
         } else {
-            $createdAt = new \DateTimeImmutable();
+            $createdAt = new DateTimeImmutable();
         }
 
         return new BookingRequestDto(
@@ -38,8 +40,8 @@ final class BookingMappers
             'house_id' => isset($dto->house_id) ? (string)$dto->house_id : '',
             'phone' => $dto->phone ?? '',
             'comment' => $dto->comment ?? '',
-            'created_at' => ($dto->created_at instanceof \DateTimeInterface)
-                ? $dto->created_at->format(\DateTime::ATOM)
+            'created_at' => ($dto->created_at instanceof DateTimeInterface)
+                ? $dto->created_at->format(DateTimeInterface::ATOM)
                 : '',
         ];
     }

@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-interface CSVRepository
+interface CSVRepositoryInterface
 {
     public function read(string $filename): array;
     public function write(string $filename, array $data): void;
