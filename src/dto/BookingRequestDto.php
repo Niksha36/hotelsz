@@ -5,6 +5,7 @@ namespace App\dto;
 // src/Dto/BookingRequestDto.php
 namespace App\dto;
 
+use DateTimeImmutable;
 use Symfony\Component\Validator\Constraints as Assert;
 
 readonly class BookingRequestDto
@@ -15,11 +16,11 @@ readonly class BookingRequestDto
 
         #[Assert\NotNull(message: "house_id is required")]
         #[Assert\Positive(message: "house_id must be a positive integer")]
-        public ?int $house_id,
+        public ?int $houseId,
 
         #[Assert\NotBlank(message: "phone is required")]
         #[Assert\Length(
-            max: 13,
+            max: 15,
             maxMessage: "phone must be at most {{ limit }} characters long"
         )]
 
@@ -35,6 +36,10 @@ readonly class BookingRequestDto
         )]
         public ?string $comment = null,
 
-        public ?\DateTimeImmutable $created_at = null,
+        public ?DateTimeImmutable $dateFrom = null,
+
+        public ?DateTimeImmutable $dateTo = null,
+
+        public ?DateTimeImmutable $createdAt = null
     ) {}
 }

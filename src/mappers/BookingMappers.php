@@ -2,6 +2,9 @@
 
 namespace  App\mappers;
 use App\dto\BookingRequestDto;
+use App\Entity\BookingEntity;
+use App\Entity\HouseEntity;
+use App\Entity\UserEntity;
 use DateTimeImmutable;
 use DateTimeInterface;
 
@@ -26,10 +29,10 @@ final class BookingMappers
 
         return new BookingRequestDto(
             id: isset($data['id']) && $data['id'] !== '' ? (int)$data['id'] : null,
-            house_id: $houseId,
+            houseId: $houseId,
             phone: $phone,
             comment: $comment,
-            created_at: $createdAt
+            createdAt: $createdAt
         );
     }
 
@@ -37,12 +40,37 @@ final class BookingMappers
     {
         return [
             'id' => isset($dto->id) ? (string)$dto->id : '',
-            'house_id' => isset($dto->house_id) ? (string)$dto->house_id : '',
+            'house_id' => isset($dto->houseId) ? (string)$dto->houseId : '',
             'phone' => $dto->phone ?? '',
             'comment' => $dto->comment ?? '',
-            'created_at' => ($dto->created_at instanceof DateTimeInterface)
-                ? $dto->created_at->format(DateTimeInterface::ATOM)
+            'created_at' => ($dto->createdAt instanceof DateTimeInterface)
+                ? $dto->createdAt->format(DateTimeInterface::ATOM)
                 : '',
         ];
+    }
+
+    public static function fromDtoToEntity(BookingRequestDto $dto, UserEntity $user, HouseEntity $house): BookingEntity
+    {
+        $entity = new BookingEntity();
+        $entity->setUser($user);
+        $entity->setHouse($house);
+        $entity->setComment($dto->comment);
+        $entity->setDateFrom($dto->dateFrom);
+        $entity->setDateTo($dto->dateTo);
+        return $entity;
+    }
+
+    public static function fromEntityToDto(BookingEntity $entity): BookingRequestDto
+    {
+        $dto = new BookingRequestDto(
+            id: $entity->getId(),
+            houseId: $entity->getHouse()?->getId(),
+            phone: $entity->getPhone(),
+            comment: $entity->getComment(),
+            dateFrom: $entity->getDateFrom(),
+            dateTo: $entity->getDateTo(),
+            createdAt: $entity->getCreatedAt()
+        );
+        return $dto;
     }
 }

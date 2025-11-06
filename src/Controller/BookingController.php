@@ -2,104 +2,76 @@
 
 namespace App\Controller;
 
-use App\mappers\BookingMappers;
-use App\Services\ServicesCSV;
-use App\Services\ViolationFormatter;
+use App\dto\AvailableHousesRequestDto;
+use App\dto\BookingRequestDto;
+use App\Services\BookingService;
+use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/booking')]
 class BookingController extends AbstractController
 {
-    private ServicesCSV $csvService;
-    private ValidatorInterface $validator;
-    private ViolationFormatter $violationFormatter;
-    public function __construct(ServicesCSV $csvService, ValidatorInterface $validator, ViolationFormatter $violationFormatter)
+    private BookingService $bookingService;
+
+    public function __construct(
+        BookingService $bookingService
+    )
     {
-        $this->violationFormatter = $violationFormatter;
-        $this->csvService = $csvService;
-        $this->validator = $validator;
+        $this->bookingService = $bookingService;
     }
 
     #[Route(methods: ['POST'])]
-    public function bookHouse(Request $request): JsonResponse
+    public function bookHouse(#[MapRequestPayload] BookingRequestDto $bookingDto): JsonResponse
     {
-        $dataMap = json_decode($request->getContent(), true) ?? $request->request->all();
-        $dto = BookingMappers::toBookingRequestDto($dataMap);
-        $violations = $this->validator->validate($dto);
-        if (count($violations) > 0) {
-            throw new HttpException(
-                422,
-                json_encode(['errors' => $this->violationFormatter->format($violations)]),
-                null,
-                ['Content-Type' => 'application/json']
-            );
+        try {
+            $savedBookingDto = $this->bookingService->saveBooking($bookingDto);
+            return $this->json($savedBookingDto, 201);
+        } catch (RuntimeException $e) {
+            throw new HttpException(400, $e->getMessage());
         }
-        $csvData = $this->csvService->readCSV("houses");
-        $savedBooking = null;
-
-        foreach ($csvData as &$house) {
-            if ($house['id'] == $dto->house_id) {
-                if ($house['is_booked']) {
-                    throw new HttpException(
-                        400,
-                        json_encode(['error' => 'House is already booked']),
-                        null,
-                        ['Content-Type' => 'application/json']
-                    );
-                }
-
-                $house['is_booked'] = 1;
-                $this->csvService->updateCsv("houses", $house['id'], $house);
-                $savedBooking = $this->csvService->writeCSV("bookings", $dataMap);
-                break;
-            }
-        }
-
-        if ($savedBooking === null) {
-            throw new HttpException(404, json_encode(['error' => 'House not found']), null, ['Content-Type' => 'application/json']);
-        }
-
-        return $this->json(BookingMappers::toBookingRequestDto($savedBooking), 200);
     }
 
+
     #[Route('/{id}', methods: ['PUT'])]
-    public function updateBooking(Request $request, string $id): JsonResponse
+    public function updateBooking(#[MapRequestPayload] BookingRequestDto $bookingDto, int $id): JsonResponse
     {
-        $dataMap = json_decode($request->getContent(), true) ?? $request->request->all();
-        $dataMap['id'] = $id;
-        $dto = BookingMappers::toBookingRequestDto($dataMap);
-        $violations = $this->validator->validate($dto);
-        if (count($violations) > 0) {
-            throw new HttpException(
-                422,
-                json_encode(['errors' => $this->violationFormatter->format($violations)]),
-                null,
-                ['Content-Type' => 'application/json']
-            );
+        if ($bookingDto->id !== $id) {
+            throw new HttpException(400, 'ID in the path and payload do not match');
         }
-        // Сначала в таблице houses снимаем бронь с дома, связанного с этим бронированием
-        $houses = $this->csvService->readCSV("houses");
-        foreach ($houses as $house) {
-            if ($house['id'] == $dto->house_id) {
-                $house['is_booked'] = 0;
-                $this->csvService->updateCsv("houses", $house['id'], $house);
-                break;
-            }
+        try{
+            $updatedBookingDto = $this->bookingService->saveBooking($bookingDto);
+            return $this->json($updatedBookingDto, 200);
+        } catch (RuntimeException $e) {
+            throw new HttpException(400, $e->getMessage());
         }
-        // Затем обновляем само бронирование
-        $this->csvService->updateCsv("bookings", $id, BookingMappers::fromBookingRequestDtoToMap($dto));
-        return $this->json($dto, 200);
     }
 
     #[Route('/{id}', methods: ['DELETE'])]
-    public function deleteBooking(string $id): JsonResponse
+    public function deleteBooking(int $id): JsonResponse
     {
-        $this->csvService->deleteById('bookings', $id);
-        return $this->json(['message' => 'Booking deleted successfully'], 200);
+        try{
+            $this->bookingService->deleteBooking($id);
+            return $this->json(['message' => 'Booking deleted successfully'], 200);
+        } catch (RuntimeException $e) {
+            throw new HttpException(400, $e->getMessage());
+        }
+    }
+
+
+    #[Route('/booking/available', methods: ['GET'])]
+    public function getHousesAvailableForThePeriod(#[MapRequestPayload] AvailableHousesRequestDto $requestDto): JsonResponse
+    {
+        try {
+            $availableHouses = $this->bookingService->getHousesAvailableForThePeriod($requestDto->dateFrom, $requestDto->dateTo);
+            return $this->json($availableHouses, 200);
+        } catch (RuntimeException $e) {
+            throw new HttpException(400, $e->getMessage());
+        }
     }
 }
+
+

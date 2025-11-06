@@ -2,44 +2,35 @@
 
 namespace App\Controller;
 
-use App\mappers\HouseMappers;
-use App\Services\ServicesCSV;
+use App\dto\HouseDto;
+use App\Services\HouseService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/houses')]
 class HousesController extends AbstractController
 {
-    private ServicesCSV $csvService;
+    private HouseService $houseService;
 
-    public function __construct(ServicesCSV $csvService)
+    public function __construct(HouseService $houseService)
     {
-        $this->csvService = $csvService;
+        $this->houseService = $houseService;
     }
 
-    #[Route('/available', methods: ['GET'])]
-    public function getAvailableHouses(): JsonResponse
-    {
-        $csvData = $this->csvService->readCSV("houses");
-
-        $availableHouses = array_map(
-            fn($house) => HouseMappers::toHouseDto($house),
-            array_filter(
-                $csvData,
-                fn($house) => ((int)($house['is_booked'] ?? 0)) === 0
-            )
-        );
-
-        return $this->json(array_values($availableHouses));
-    }
     #[Route(methods: ['GET'])]
-    public function getHouses(): JsonResponse {
-        $csvData = $this->csvService->readCSV("houses");
-        $houses = array_map(
-            fn($house) => HouseMappers::toHouseDto($house),
-            $csvData
-        );
-        return $this->json($houses);
+    public function getHouses(): JsonResponse
+    {
+        $houses = $this->houseService->getHouses();
+        return $this->json($houses, Response::HTTP_OK);
+    }
+
+    #[Route(methods: ['POST'])]
+    public function putHouse(#[MapRequestPayload] HouseDto $houseDto): JsonResponse
+    {
+        $savedHouse = $this->houseService->saveHouse($houseDto);
+        return $this->json($savedHouse, Response::HTTP_CREATED);
     }
 }

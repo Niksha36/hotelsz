@@ -1,6 +1,8 @@
 <?php
 namespace  App\mappers;
 use App\dto\HouseDto;
+use App\Entity\HouseEntity;
+
 final class HouseMappers {
     public static function toHouseDto(array $data): HouseDto
     {
@@ -9,25 +11,31 @@ final class HouseMappers {
             name: $data['name'],
             type: $data['type'],
             beds: (int)$data['beds'],
-            amenities: explode(';', $data['amenities']),
             rowFromSea: (int)$data['row_from_sea'],
             pricePerNightRub: (float)$data['price_per_night_rub'],
-            isBooked: (bool)$data['is_booked'],
+        );
+    }
+    public static function fromEntityToDto($entity): HouseDto
+    {
+        return new HouseDto(
+            id: $entity->getId(),
+            name: $entity->getName(),
+            type: $entity->getType(),
+            beds: $entity->getBeds(),
+            rowFromSea: $entity->getRowFromSea(),
+            pricePerNightRub: $entity->getPricePerNightRub(),
         );
     }
 
-    public static function fromHouseDtoToMap(HouseDto $dto): array
+    public static function fromDtoToEntity(HouseDto $dto): HouseEntity
     {
-        return [
-            'id' => isset($dto->id) ? (string)$dto->id : '',
-            'name' => $dto->name ?? '',
-            'type' => $dto->type ?? '',
-            'beds' => isset($dto->beds) ? (string)$dto->beds : '',
-            'amenities' => !empty($dto->amenities) ? implode(';', $dto->amenities) : '',
-            'row_from_sea' => isset($dto->rowFromSea) ? (string)$dto->rowFromSea : '',
-            'price_per_night_rub' => isset($dto->pricePerNightRub) ? (string)$dto->pricePerNightRub : '',
-            'is_booked' => $dto->isBooked ? '1' : '0',
-        ];
+        $entity = new HouseEntity();
+        $entity->setName($dto->name);
+        $entity->setType($dto->type);
+        $entity->setBeds($dto->beds);
+        $entity->setRowFromSea($dto->rowFromSea);
+        $entity->setPricePerNightRub($dto->pricePerNightRub);
+        return $entity;
     }
 }
 
