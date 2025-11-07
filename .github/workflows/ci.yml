@@ -1,62 +1,55 @@
 name: CI Pipeline
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    push:
+        branches: [ "master" ]
+    pull_request:
+        branches: [ "master" ]
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
+    test:
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
 
-      - name: Install Docker Compose
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y curl
-          sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-          sudo chmod +x /usr/local/bin/docker-compose
+            - name: Install Docker Compose
+              run: |
+                  sudo apt-get update
+                  sudo apt-get install -y curl
+                  sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+                  sudo chmod +x /usr/local/bin/docker-compose
 
-      - name: Load .env.test variables into GitHub Environment (if present)
-        run: |
-          if [ -f .env.test ]; then
-            cat .env.test >> $GITHUB_ENV
-          fi
+            - name: Load .env.test variables into GitHub Environment
+              run: |
+                  cat .env.test >> $GITHUB_ENV
 
-      - name: Build php image
-        run: |
-          docker-compose build php
+            - name: Use test env
+              run: |
+                  cp .env.test .env
 
-      - name: Install Composer dependencies (no scripts)
-        env:
-          APP_ENV: test
-          APP_SECRET: test_secret
-          # Безопасный URL для Doctrine; БД не используется, соединение не устанавливается
-          DATABASE_URL: postgresql://user:pass@127.0.0.1:5432/db?serverVersion=15&charset=utf8
-        run: |
-          docker-compose run --rm --no-deps -T \
-            -e APP_ENV -e APP_SECRET -e DATABASE_URL \
-            php composer install --no-interaction --prefer-dist --no-progress --no-scripts
+            - name: Start services
+              run: |
+                  docker-compose up -d --build
 
-      - name: Run tests
-        env:
-          APP_ENV: test
-          APP_SECRET: test_secret
-          DATABASE_URL: postgresql://user:pass@127.0.0.1:5432/db?serverVersion=15&charset=utf8
-        run: |
-          mkdir -p var/test-reports
-          docker-compose run --rm --no-deps -T \
-            -e APP_ENV -e APP_SECRET -e DATABASE_URL \
-            php ./bin/phpunit --log-junit var/test-reports/junit.xml
+            - name: Install Composer dependencies
+              run: |
+                   docker-compose exec -T --user root php bash -lc "git config --global --add safe.directory /var/www/html && composer install --no-interaction --prefer-dist --optimize-autoloader"
 
-      - name: Upload test reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: junit-php
-          path: var/test-reports/
-          if-no-files-found: warn
+            - name: Fix permissions for tests
+              run: |
+                docker-compose exec -T --user root php bash -lc "
+                  mkdir -p var/cache/test var/log &&
+                  chown -R www-data:www-data /var/www/html &&
+                  find var -type d -exec chmod 775 {} \; &&
+                  find var -type f -exec chmod 664 {} \;
+                "
+
+            - name: Run tests
+              run: |
+                docker-compose exec -T --user www-data php bash -lc "APP_ENV=test APP_DEBUG=1 php ./vendor/bin/phpunit --do-not-cache-result tests/api tests/services"
+
+            - name: Stop and remove containers
+              run: |
+                  docker-compose down -v

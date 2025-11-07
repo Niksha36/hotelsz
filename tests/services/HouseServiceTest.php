@@ -2,10 +2,10 @@
 
 namespace App\Tests\services;
 
-use App\Services\HouseService;
-use App\Infrastructure\Persistence\HouseRepository;
-use App\Entity\HouseEntity;
 use App\dto\HouseDto;
+use App\Entity\HouseEntity;
+use App\Infrastructure\Persistence\HouseRepository;
+use App\Services\HouseService;
 use PHPUnit\Framework\TestCase;
 
 class HouseServiceTest extends TestCase
