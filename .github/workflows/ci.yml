@@ -48,7 +48,16 @@ jobs:
 
             - name: Run tests
               run: |
-                docker-compose exec -T --user www-data php bash -lc "APP_ENV=test APP_DEBUG=1 php ./vendor/bin/phpunit --do-not-cache-result tests/api tests/services"
+                docker-compose exec -T --user www-data php bash -lc "composer run ci:tests"
+
+            - name: Run PHPCS
+              run: docker-compose exec -T --user www-data php bash -lc "composer run cs:check"
+
+            - name: Run PHP-CS-Fixer dry-run
+              run: docker-compose exec -T --user www-data php bash -lc "composer run cs:fix-dry"
+
+            - name: Run Psalm
+              run: docker-compose exec -T --user www-data php bash -lc "composer run psalm"
 
             - name: Stop and remove containers
               run: |

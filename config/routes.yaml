@@ -3,3 +3,42 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+
+houses_get:
+    path: /houses
+    controller: App\Controller\HousesController::getHouses
+    methods: [GET]
+
+houses_post:
+    path: /houses
+    controller: App\Controller\HousesController::putHouse
+    methods: [POST]
+
+booking_create:
+    path: /booking
+    controller: App\Controller\BookingController::bookHouse
+    methods: [POST]
+
+booking_update:
+    path: /booking/{id}
+    controller: App\Controller\BookingController::updateBooking
+    methods: [PUT]
+    requirements:
+        id: '\d+'
+
+booking_delete:
+    path: /booking/{id}
+    controller: App\Controller\BookingController::deleteBooking
+    methods: [DELETE]
+    requirements:
+        id: '\d+'
+
+booking_available:
+    path: /booking/available
+    controller: App\Controller\BookingController::getHousesAvailableForThePeriod
+    methods: [GET]
+
+user_create:
+    path: /user
+    controller: App\Controller\UserController::createUser
+    methods: [POST]

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\dto\AvailableHousesRequestDto;
@@ -34,7 +36,6 @@ class BookingController extends AbstractController
         }
     }
 
-
     #[Route('/{id}', methods: ['PUT'])]
     public function updateBooking(#[MapRequestPayload] BookingRequestDto $bookingDto, int $id): JsonResponse
     {
@@ -59,7 +60,6 @@ class BookingController extends AbstractController
             throw new HttpException(400, $e->getMessage());
         }
     }
-
 
     #[Route('/booking/available', methods: ['GET'])]
     public function getHousesAvailableForThePeriod(#[MapRequestPayload] AvailableHousesRequestDto $requestDto): JsonResponse

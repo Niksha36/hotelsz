@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\mappers;
 
 use App\dto\UserDto;

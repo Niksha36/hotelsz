@@ -1,38 +1,40 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
-use App\Infrastructure\Persistence\BookingRepository;
+use App\Repository\BookingRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: BookingRepository::class)]
-#[ORM\Table(name: "booking")]
+#[ORM\Table(name: 'booking')]
 class BookingEntity
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type:"integer")]
+    #[ORM\Column(type:'integer')]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: HouseEntity::class, inversedBy: "bookings")]
-    #[ORM\JoinColumn(nullable:false, onDelete:"CASCADE")]
+    #[ORM\ManyToOne(targetEntity: HouseEntity::class, inversedBy: 'bookings')]
+    #[ORM\JoinColumn(nullable:false, onDelete:'CASCADE')]
     private ?HouseEntity $house = null;
 
     #[ORM\ManyToOne(targetEntity: UserEntity::class)]
-    #[ORM\JoinColumn(name: "phone", referencedColumnName: "phone", nullable: false, onDelete: "RESTRICT")]
+    #[ORM\JoinColumn(name: 'phone', referencedColumnName: 'phone', nullable: false, onDelete: 'RESTRICT')]
     private ?UserEntity $user = null;
 
-    #[ORM\Column(type:"text", nullable:true)]
+    #[ORM\Column(type:'text', nullable:true)]
     private ?string $comment = null;
 
-    #[ORM\Column(type:"date", nullable:true)]
-    private ?\DateTimeImmutable $dateFrom = null;
+    #[ORM\Column(type:'date', nullable:true)]
+    private ?DateTimeImmutable $dateFrom = null;
 
-    #[ORM\Column(type:"date", nullable:true)]
-    private ?\DateTimeImmutable $dateTo = null;
+    #[ORM\Column(type:'date', nullable:true)]
+    private ?DateTimeImmutable $dateTo = null;
 
-    #[ORM\Column(type:"datetime_immutable")]
+    #[ORM\Column(type:'datetime_immutable')]
     private DateTimeImmutable $createdAt;
 
     public function __construct()

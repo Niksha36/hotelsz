@@ -47,6 +47,7 @@
         "twig/extra-bundle": "^2.12|^3.0",
         "twig/twig": "^2.12|^3.0"
     },
+
     "config": {
         "allow-plugins": {
             "php-http/discovery": true,
@@ -87,7 +88,14 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
-        ]
+        ],
+        "ci:tests": "APP_ENV=test APP_DEBUG=1 php ./vendor/bin/phpunit --do-not-cache-result tests/api tests/services",
+        "tests": "docker-compose --env-file ./.env.test exec -e APP_ENV=test -e APP_DEBUG=1 php bin/phpunit --testdox-html var/test-reports/house-controller-report.html tests/api tests/services",
+        "cs:check": "phpcs --standard=phpcs.xml.dist --extensions=php --report=summary src tests",
+        "cs:cbf": "phpcbf --standard=phpcs.xml.dist --extensions=php src tests",
+        "cs:fix": "php-cs-fixer fix --config=.php-cs-fixer.dist.php --using-cache=yes src tests",
+        "psalm": "psalm --config=psalm.xml --no-progress --show-info=false",
+        "check:all": "composer run cs:check && composer run cs:cbf || true && composer run cs:fix -- --dry-run --diff && composer run psalm"
     },
     "conflict": {
         "symfony/symfony": "*"
@@ -101,6 +109,7 @@
     "require-dev": {
         "friendsofphp/php-cs-fixer": "*",
         "phpunit/phpunit": "^12.4",
+        "psalm/plugin-symfony": "^5.2",
         "squizlabs/php_codesniffer": "^4.0",
         "symfony/browser-kit": "7.3.*",
         "symfony/css-selector": "7.3.*",

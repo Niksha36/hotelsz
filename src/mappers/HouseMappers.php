@@ -1,23 +1,14 @@
 <?php
 
-namespace  App\mappers;
+declare(strict_types=1);
+
+namespace App\mappers;
 
 use App\dto\HouseDto;
 use App\Entity\HouseEntity;
 
 final class HouseMappers
 {
-    public static function toHouseDto(array $data): HouseDto
-    {
-        return new HouseDto(
-            id: (int)$data['id'],
-            name: $data['name'],
-            type: $data['type'],
-            beds: (int)$data['beds'],
-            rowFromSea: (int)$data['row_from_sea'],
-            pricePerNightRub: (float)$data['price_per_night_rub'],
-        );
-    }
     public static function fromEntityToDto($entity): HouseDto
     {
         return new HouseDto(

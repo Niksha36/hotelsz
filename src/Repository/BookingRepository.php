@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Infrastructure\Persistence;
+declare(strict_types=1);
+
+namespace App\Repository;
 
 use App\Entity\BookingEntity;
 use App\Entity\HouseEntity;
@@ -10,10 +12,18 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class BookingRepository extends ServiceEntityRepository
 {
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     * @psalm-suppress PossiblyUnusedParam
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, BookingEntity::class);
     }
+
+    /**
+     * @psalm-suppress PossiblyUnusedParam
+     */
     public function save(BookingEntity $entity, bool $flush = true): BookingEntity
     {
         $this->getEntityManager()->persist($entity);
@@ -23,6 +33,10 @@ class BookingRepository extends ServiceEntityRepository
         }
         return $entity;
     }
+
+    /**
+     * @psalm-suppress PossiblyUnusedParam
+     */
     public function remove(BookingEntity $entity, bool $flush = true): void
     {
         $this->getEntityManager()->remove($entity);
@@ -32,6 +46,10 @@ class BookingRepository extends ServiceEntityRepository
         }
     }
 
+
+    /**
+     * @psalm-suppress PossiblyUnusedParam
+     */
     public function isHouseBookedForThePeriod(int $houseId, DateTimeImmutable $startDate, DateTimeImmutable $endDate): bool
     {
         $qb = $this->createQueryBuilder('b');
@@ -52,13 +70,13 @@ class BookingRepository extends ServiceEntityRepository
 
         return $count > 0;
     }
-     /**
-     *
-     * @return \App\Entity\HouseEntity[]
-     */
+
     /**
-     *
-     * @return \App\Entity\HouseEntity[]
+     * @param DateTimeImmutable $startDate
+     * @param DateTimeImmutable $endDate
+     * @return HouseEntity[]
+     * @psalm-suppress PossiblyUnusedParam
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function getHousesAvailableForThePeriod(DateTimeImmutable $startDate, DateTimeImmutable $endDate): array
     {

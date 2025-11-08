@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\dto\UserDto;
-use App\Infrastructure\Persistence\BookingRepository;
-use App\Infrastructure\Persistence\UserRepository;
 use App\mappers\UserMappers;
+use App\Repository\UserRepository;
 
 class UserService
 {
