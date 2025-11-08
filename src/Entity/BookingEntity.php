@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Entity;
 
 use App\Infrastructure\Persistence\BookingRepository;
@@ -39,13 +40,30 @@ class BookingEntity
         $this->createdAt = new DateTimeImmutable();
     }
 
-    public function getId(): ?int { return $this->id; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-    public function getHouse(): ?HouseEntity { return $this->house; }
-    public function setHouse(HouseEntity $house): self { $this->house = $house; return $this; }
+    public function getHouse(): ?HouseEntity
+    {
+        return $this->house;
+    }
+    public function setHouse(HouseEntity $house): self
+    {
+        $this->house = $house;
+        return $this;
+    }
 
-    public function getUser(): ?UserEntity { return $this->user; }
-    public function setUser(UserEntity $user): self { $this->user = $user; return $this; }
+    public function getUser(): ?UserEntity
+    {
+        return $this->user;
+    }
+    public function setUser(UserEntity $user): self
+    {
+        $this->user = $user;
+        return $this;
+    }
 
     // удобный геттер номера телефона — вытаскиваем из связанного UserEntity
     public function getPhone(): ?string
@@ -53,13 +71,37 @@ class BookingEntity
         return $this->user?->getPhone();
     }
 
-    public function getComment(): ?string { return $this->comment; }
-    public function setComment(?string $comment): self { $this->comment = $comment; return $this; }
+    public function getComment(): ?string
+    {
+        return $this->comment;
+    }
+    public function setComment(?string $comment): self
+    {
+        $this->comment = $comment;
+        return $this;
+    }
 
-    public function getDateFrom(): ?DateTimeImmutable { return $this->dateFrom; }
-    public function setDateFrom(?DateTimeImmutable $dateFrom): self { $this->dateFrom = $dateFrom; return $this; }
-    public function getDateTo(): ?DateTimeImmutable { return $this->dateTo; }
-    public function setDateTo(?DateTimeImmutable $dateTo): self { $this->dateTo = $dateTo; return $this; }
+    public function getDateFrom(): ?DateTimeImmutable
+    {
+        return $this->dateFrom;
+    }
+    public function setDateFrom(?DateTimeImmutable $dateFrom): self
+    {
+        $this->dateFrom = $dateFrom;
+        return $this;
+    }
+    public function getDateTo(): ?DateTimeImmutable
+    {
+        return $this->dateTo;
+    }
+    public function setDateTo(?DateTimeImmutable $dateTo): self
+    {
+        $this->dateTo = $dateTo;
+        return $this;
+    }
 
-    public function getCreatedAt(): DateTimeImmutable { return $this->createdAt; }
+    public function getCreatedAt(): DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
 }

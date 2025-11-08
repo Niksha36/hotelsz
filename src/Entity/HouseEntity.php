@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Entity;
+
 use App\Infrastructure\Persistence\HouseRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;

@@ -10,8 +10,8 @@ use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-class BookingControllerTest extends WebTestCase {
-
+class BookingControllerTest extends WebTestCase
+{
     public function testBookHouseSuccess(): void
     {
         $client = static::createClient();

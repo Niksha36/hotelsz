@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Services;
+
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 final class ViolationFormatter

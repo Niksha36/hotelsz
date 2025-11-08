@@ -1,9 +1,12 @@
 <?php
+
 namespace  App\mappers;
+
 use App\dto\HouseDto;
 use App\Entity\HouseEntity;
 
-final class HouseMappers {
+final class HouseMappers
+{
     public static function toHouseDto(array $data): HouseDto
     {
         return new HouseDto(
@@ -38,4 +41,3 @@ final class HouseMappers {
         return $entity;
     }
 }
-

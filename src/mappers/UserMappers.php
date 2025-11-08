@@ -7,7 +7,7 @@ use App\Entity\UserEntity;
 
 final class UserMappers
 {
-    static public function fromUserDtoToEntity(UserDto $userDto): UserEntity
+    public static function fromUserDtoToEntity(UserDto $userDto): UserEntity
     {
         return new UserEntity(
             $userDto->phone,
@@ -17,7 +17,7 @@ final class UserMappers
         );
     }
 
-    static public function fromUserEntityToDto(UserEntity $user): UserDto
+    public static function fromUserEntityToDto(UserEntity $user): UserDto
     {
         return new UserDto(
             $user->getPhone(),

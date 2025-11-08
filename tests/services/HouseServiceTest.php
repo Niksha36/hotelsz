@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class HouseServiceTest extends TestCase
 {
-    private function makeHouseEntity(int $id, string $name = 'Name', string $type='type', int $beds=2, int $row=1, int $price=1000): HouseEntity
+    private function makeHouseEntity(int $id, string $name = 'Name', string $type = 'type', int $beds = 2, int $row = 1, int $price = 1000): HouseEntity
     {
         $e = new HouseEntity();
         $e->setName($name)->setType($type)->setBeds($beds)->setRowFromSea($row)->setPricePerNightRub($price);

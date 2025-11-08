@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-
 use App\dto\BookingRequestDto;
 use App\Entity\BookingEntity;
 use App\Entity\HouseEntity;

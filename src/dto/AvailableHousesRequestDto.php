@@ -9,5 +9,6 @@ readonly class AvailableHousesRequestDto
     public function __construct(
         public DateTimeImmutable $dateFrom,
         public DateTimeImmutable $dateTo
-    ) {}
+    ) {
+    }
 }
