@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\services;
 
 use App\dto\HouseDto;
 use App\Entity\HouseEntity;
-use App\Infrastructure\Persistence\HouseRepository;
+use App\Repository\HouseRepository;
 use App\Services\HouseService;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 class HouseServiceTest extends TestCase
 {
@@ -14,7 +17,7 @@ class HouseServiceTest extends TestCase
     {
         $e = new HouseEntity();
         $e->setName($name)->setType($type)->setBeds($beds)->setRowFromSea($row)->setPricePerNightRub($price);
-        $ref = new \ReflectionClass($e);
+        $ref = new ReflectionClass($e);
         $prop = $ref->getProperty('id');
         $prop->setAccessible(true);
         $prop->setValue($e, $id);

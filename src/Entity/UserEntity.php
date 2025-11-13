@@ -1,24 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-#[ORM\Table(name: "users")]
+#[ORM\Table(name: 'users')]
 class UserEntity
 {
     #[ORM\Id]
-    #[ORM\Column(type: "string", length: 15)]
+    #[ORM\Column(type: 'string', length: 15)]
     private string $phone;
 
-    #[ORM\Column(type: "string", length: 100)]
+    #[ORM\Column(type: 'string', length: 100)]
     private string $firstName;
 
-    #[ORM\Column(type: "string", length: 100)]
+    #[ORM\Column(type: 'string', length: 100)]
     private string $lastName;
 
-    #[ORM\Column(type: "string", length: 180, unique: true)]
+    #[ORM\Column(type: 'string', length: 180, unique: true)]
     private string $email;
 
     public function __construct(string $phone, string $firstName, string $lastName, string $email)

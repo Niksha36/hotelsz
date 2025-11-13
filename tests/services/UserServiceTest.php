@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\services;
 
-use App\Services\UserService;
-use App\Infrastructure\Persistence\UserRepository;
 use App\dto\UserDto;
+use App\Repository\UserRepository;
+use App\Services\UserService;
 use PHPUnit\Framework\TestCase;
 
 class UserServiceTest extends TestCase

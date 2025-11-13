@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\dto\HouseDto;
-use App\Infrastructure\Persistence\HouseRepository;
-use App\mappers\BookingMappers;
 use App\mappers\HouseMappers;
+use App\Repository\HouseRepository;
 
 class HouseService
 {
@@ -19,7 +20,7 @@ class HouseService
      */
     public function getHouses(): array
     {
-        return array_map(fn($entity) => HouseMappers::fromEntityToDto($entity), $this->houseRepository->findAll());
+        return array_map(fn ($entity) => HouseMappers::fromEntityToDto($entity), $this->houseRepository->findAll());
     }
     public function saveHouse(HouseDto $houseDto): HouseDto
     {

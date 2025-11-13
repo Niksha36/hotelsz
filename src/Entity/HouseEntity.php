@@ -1,40 +1,42 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
-use App\Infrastructure\Persistence\HouseRepository;
+use App\Repository\HouseRepository;
 use DateTimeImmutable;
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: HouseRepository::class)]
-#[ORM\Table(name: "house")]
+#[ORM\Table(name: 'house')]
 class HouseEntity
 {
-    #[ORM\Id, ORM\GeneratedValue, ORM\Column(type:"integer")]
+    #[ORM\Id, ORM\GeneratedValue, ORM\Column(type:'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(type:"string", length:255)]
+    #[ORM\Column(type:'string', length:255)]
     private string $name;
 
     // можно заменить на enum-backed column
-    #[ORM\Column(type:"string", length:50)]
+    #[ORM\Column(type:'string', length:50)]
     private string $type;
 
-    #[ORM\Column(type:"smallint")]
+    #[ORM\Column(type:'smallint')]
     private int $beds;
 
-    #[ORM\Column(type:"integer")]
+    #[ORM\Column(type:'integer')]
     private int $rowFromSea;
 
-    #[ORM\Column(type:"integer")]
-    private int $pricePerNightRub;
+    #[ORM\Column(type:'float')]
+    private float $pricePerNightRub;
 
-    #[ORM\OneToMany(mappedBy: "house", targetEntity: BookingEntity::class, cascade:["persist","remove"])]
+    #[ORM\OneToMany(mappedBy: 'house', targetEntity: BookingEntity::class, cascade:['persist','remove'])]
     private Collection $bookings;
 
-    #[ORM\Column(type:"datetime_immutable")]
+    #[ORM\Column(type:'datetime_immutable')]
     private DateTimeImmutable $createdAt;
 
     public function __construct()
@@ -91,12 +93,12 @@ class HouseEntity
         return $this;
     }
 
-    public function getPricePerNightRub(): int
+    public function getPricePerNightRub(): float
     {
         return $this->pricePerNightRub;
     }
 
-    public function setPricePerNightRub(int $pricePerNightRub): self
+    public function setPricePerNightRub(float $pricePerNightRub): self
     {
         $this->pricePerNightRub = $pricePerNightRub;
         return $this;
