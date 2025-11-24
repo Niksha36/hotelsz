@@ -6,6 +6,9 @@ namespace App\dto;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * @psalm-suppress PossiblyUnusedProperty
+ */
 readonly class UserDto
 {
     public function __construct(

@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/houses')]
+#[Route('/api')]
 class HousesController extends AbstractController
 {
     private HouseService $houseService;
@@ -22,14 +22,14 @@ class HousesController extends AbstractController
         $this->houseService = $houseService;
     }
 
-    #[Route(methods: ['GET'])]
+    #[Route('/houses', methods: ['GET'])]
     public function getHouses(): JsonResponse
     {
         $houses = $this->houseService->getHouses();
         return $this->json($houses, Response::HTTP_OK);
     }
 
-    #[Route(methods: ['POST'])]
+    #[Route('/admin/houses', methods: ['POST'])]
     public function putHouse(#[MapRequestPayload] HouseDto $houseDto): JsonResponse
     {
         $savedHouse = $this->houseService->saveHouse($houseDto);
