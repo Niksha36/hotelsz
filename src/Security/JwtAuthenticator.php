@@ -6,6 +6,7 @@ namespace App\Security;
 
 use App\Repository\UserRepository;
 use Exception;
+use Override;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,7 +33,7 @@ final class JwtAuthenticator extends AbstractAuthenticator
      * Поддерживаем ли аутентификацию для данного запроса.
      * Проверяем наличие заголовка Authorization: Bearer ...
      */
-    #[\Override]
+    #[Override]
     public function supports(Request $request): ?bool
     {
         $authHeader = $request->headers->get('Authorization', '');
@@ -44,7 +45,7 @@ final class JwtAuthenticator extends AbstractAuthenticator
      *
      * @throws AuthenticationException при любых проблемах аутентификации
      */
-    #[\Override]
+    #[Override]
     public function authenticate(Request $request): Passport
     {
         $authHeader = $request->headers->get('Authorization', '');
@@ -79,7 +80,7 @@ final class JwtAuthenticator extends AbstractAuthenticator
     /**
      * Успешная аутентификация — продолжаем обработку запроса.
      */
-    #[\Override]
+    #[Override]
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         return null;
@@ -88,7 +89,7 @@ final class JwtAuthenticator extends AbstractAuthenticator
     /**
      * Неуспешная аутентификация — возвращаем 401 и JSON-ошибку.
      */
-    #[\Override]
+    #[Override]
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         $message = $exception instanceof CustomUserMessageAuthenticationException
