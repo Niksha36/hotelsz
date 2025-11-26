@@ -13,13 +13,23 @@ security:
             pattern: ^/auth
             stateless: true
             security: false
+        swagger_ui:
+            pattern: ^/api/doc
+            stateless: true
+            security: false
+
+        swagger_json:
+            pattern: ^/api/doc.json
+            stateless: true
+            security: false
         api:
             pattern: ^/api
             provider: app_user_provider
             stateless: true
             custom_authenticator: 'App\Security\JwtAuthenticator'
-
     access_control:
+        - { path:  ^/api/doc, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path:  ^/api/doc.json, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/auth, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/admin, roles: ROLE_ADMIN }
         - { path: ^/api, roles: ROLE_USER }
