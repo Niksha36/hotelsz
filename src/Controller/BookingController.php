@@ -7,14 +7,16 @@ namespace App\Controller;
 use App\dto\AvailableHousesRequestDto;
 use App\dto\BookingRequestDto;
 use App\Entity\UserEntity;
+use App\Enum\BookingFilter;
+use App\Enum\SortDirection;
 use App\Services\BookingService;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
-use OpenApi\Attributes\SecurityScheme;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Annotation\Route;
@@ -210,5 +212,13 @@ class BookingController extends AbstractController
         } catch (RuntimeException $e) {
             throw new HttpException(400, $e->getMessage());
         }
+    }
+
+    #[Route('admin/filter', methods: ['GET'])]
+    public function getHousesByFilter(string $field, string $direction): JsonResponse
+    {
+        $fieldEnum = BookingFilter::tryFrom($field);
+        $directionEnum = SortDirection::tryFrom(strtolower($direction));
+        return $this->json($this->bookingService->getBookingsFilteredBy($fieldEnum, $directionEnum), Response::HTTP_CREATED);
     }
 }

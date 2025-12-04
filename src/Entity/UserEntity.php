@@ -76,6 +76,11 @@ class UserEntity implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->phone;
     }
 
+    public function setPhone(string $phone): void
+    {
+        $this->phone = $phone;
+    }
+
     public function getFirstName(): string
     {
         return $this->firstName;

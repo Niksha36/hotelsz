@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\dto\HouseDto;
+use App\Enum\HouseFilters;
+use App\Enum\SortDirection;
 use App\Services\HouseService;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
@@ -12,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/api')]
@@ -19,10 +22,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class HousesController extends AbstractController
 {
     private HouseService $houseService;
-
-    public function __construct(HouseService $houseService)
+    private SerializerInterface $serializer;
+    public function __construct(HouseService $houseService, SerializerInterface $serializer)
     {
         $this->houseService = $houseService;
+        $this->serializer = $serializer;
     }
 
     #[Route('/houses', methods: ['GET'])]
@@ -76,5 +80,13 @@ class HousesController extends AbstractController
     {
         $savedHouse = $this->houseService->saveHouse($houseDto);
         return $this->json($savedHouse, Response::HTTP_CREATED);
+    }
+
+    #[Route('/houses/filter', methods: ['POST'])]
+    public function fromStrings(string $field, string $direction): JsonResponse
+    {
+        $fieldEnum = HouseFilters::tryFrom($field);
+        $directionEnum = SortDirection::tryFrom(strtolower($direction));
+        return $this->json($this->houseService->filterHousesBy($fieldEnum, $directionEnum), Response::HTTP_CREATED);
     }
 }

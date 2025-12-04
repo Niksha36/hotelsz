@@ -9,6 +9,20 @@ security:
                 property: phone
 
     firewalls:
+        admin:
+            pattern: ^/admin
+            stateless: false
+            form_login:
+                login_path: admin_login
+                check_path: admin_login
+                enable_csrf: true
+                default_target_path: /admin
+                csrf_token_id: authenticate
+                username_parameter: phone
+                password_parameter: password
+            logout:
+                path: admin_logout
+                target: /
         auth:
             pattern: ^/auth
             stateless: true
@@ -28,6 +42,8 @@ security:
             stateless: true
             custom_authenticator: 'App\Security\JwtAuthenticator'
     access_control:
+        - { path: ^/admin/login$, roles: PUBLIC_ACCESS }
+        - { path: ^/admin, roles: PUBLIC_ACCESS }
         - { path:  ^/api/doc, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path:  ^/api/doc.json, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/auth, roles: IS_AUTHENTICATED_ANONYMOUSLY }

@@ -9,12 +9,15 @@ use App\dto\HouseDto;
 use App\Entity\BookingEntity;
 use App\Entity\HouseEntity;
 use App\Entity\UserEntity;
+use App\Enum\BookingFilter;
+use App\Enum\SortDirection;
 use App\mappers\BookingMappers;
 use App\mappers\HouseMappers;
 use App\Repository\BookingRepository;
 use App\Repository\HouseRepository;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
+use InvalidArgumentException;
 use RuntimeException;
 
 class BookingService
@@ -69,5 +72,25 @@ class BookingService
         }
         $houses = $this->bookingRepository->getHousesAvailableForThePeriod($startDate, $endDate);
         return array_map(fn (HouseEntity $entity) => HouseMappers::fromEntityToDto($entity), $houses);
+    }
+
+    public function getBookingsFilteredBy(?BookingFilter $fieldEnum, ?SortDirection $direction): array
+    {
+        if ($fieldEnum === null) {
+            $allowed = implode(', ', array_map(fn ($case) => $case->value, BookingFilter::cases()));
+            throw new InvalidArgumentException(sprintf('Не указано поле для фильтрации. Допустимые значения: %s', $allowed));
+        }
+
+        if ($direction === null) {
+            $allowed = implode(', ', array_map(fn ($case) => $case->value, SortDirection::cases()));
+            throw new InvalidArgumentException(sprintf('Не указано направление сортировки. Допустимые значения: %s', $allowed));
+        }
+
+        $orderBy = [
+            $fieldEnum->getEntityFieldName() => $direction->name
+        ];
+
+        $entities = $this->houseRepository->findBy([], $orderBy);
+        return array_map(fn ($entity) => HouseMappers::fromEntityToDto($entity), $entities);
     }
 }
