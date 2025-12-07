@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\api;
 
-use App\Services\BookingService;
 use App\dto\BookingRequestDto;
 use App\dto\HouseDto;
+use App\Services\BookingService;
 use DateTimeImmutable;
 use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-class BookingControllerTest extends WebTestCase {
-
+class BookingControllerTest extends WebTestCase
+{
     public function testBookHouseSuccess(): void
     {
         $client = static::createClient();
@@ -33,8 +35,7 @@ class BookingControllerTest extends WebTestCase {
             phone: $requestData['phone'],
             comment: $requestData['comment'],
             dateFrom: new DateTimeImmutable($requestData['dateFrom']),
-            dateTo: new DateTimeImmutable($requestData['dateTo']),
-            createdAt: new DateTimeImmutable()
+            dateTo: new DateTimeImmutable($requestData['dateTo'])
         );
 
         $bookingServiceMock->expects($this->once())
@@ -103,11 +104,10 @@ class BookingControllerTest extends WebTestCase {
         $expectedDto = new BookingRequestDto(
             id: $requestData['id'],
             houseId: $requestData['houseId'],
-            phone: $requestData['phone'],
-            comment: $requestData['comment'],
-            dateFrom: new DateTimeImmutable($requestData['dateFrom']),
-            dateTo: new DateTimeImmutable($requestData['dateTo']),
-            createdAt: new DateTimeImmutable()
+            phone: (string)$requestData['phone'],
+            comment: (string)$requestData['comment'],
+            dateFrom: new DateTimeImmutable((string)$requestData['dateFrom']),
+            dateTo: new DateTimeImmutable((string)$requestData['dateTo'])
         );
 
         $bookingServiceMock->expects($this->once())
@@ -206,7 +206,10 @@ class BookingControllerTest extends WebTestCase {
 
         $bookingServiceMock->expects($this->once())
             ->method('getHousesAvailableForThePeriod')
-            ->with($this->callback(fn(DateTimeImmutable $d) => $d == $dateFrom), $this->callback(fn(DateTimeImmutable $d) => $d == $dateTo))
+            ->with(
+                $this->callback(fn (DateTimeImmutable $d) => $d->format('Y-m-d') === $dateFrom->format('Y-m-d')),
+                $this->callback(fn (DateTimeImmutable $d) => $d->format('Y-m-d') === $dateTo->format('Y-m-d'))
+            )
             ->willReturn($houses);
 
         $client->request(

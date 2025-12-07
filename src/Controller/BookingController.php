@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\dto\AvailableHousesRequestDto;
@@ -19,8 +21,7 @@ class BookingController extends AbstractController
 
     public function __construct(
         BookingService $bookingService
-    )
-    {
+    ) {
         $this->bookingService = $bookingService;
     }
 
@@ -35,14 +36,13 @@ class BookingController extends AbstractController
         }
     }
 
-
     #[Route('/{id}', methods: ['PUT'])]
     public function updateBooking(#[MapRequestPayload] BookingRequestDto $bookingDto, int $id): JsonResponse
     {
         if ($bookingDto->id !== $id) {
             throw new HttpException(400, 'ID in the path and payload do not match');
         }
-        try{
+        try {
             $updatedBookingDto = $this->bookingService->saveBooking($bookingDto);
             return $this->json($updatedBookingDto, 200);
         } catch (RuntimeException $e) {
@@ -53,14 +53,13 @@ class BookingController extends AbstractController
     #[Route('/{id}', methods: ['DELETE'])]
     public function deleteBooking(int $id): JsonResponse
     {
-        try{
+        try {
             $this->bookingService->deleteBooking($id);
             return $this->json(['message' => 'Booking deleted successfully'], 200);
         } catch (RuntimeException $e) {
             throw new HttpException(400, $e->getMessage());
         }
     }
-
 
     #[Route('/booking/available', methods: ['GET'])]
     public function getHousesAvailableForThePeriod(#[MapRequestPayload] AvailableHousesRequestDto $requestDto): JsonResponse
@@ -73,5 +72,3 @@ class BookingController extends AbstractController
         }
     }
 }
-
-

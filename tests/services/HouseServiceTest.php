@@ -1,20 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\services;
 
 use App\dto\HouseDto;
 use App\Entity\HouseEntity;
-use App\Infrastructure\Persistence\HouseRepository;
+use App\Repository\HouseRepository;
 use App\Services\HouseService;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 class HouseServiceTest extends TestCase
 {
-    private function makeHouseEntity(int $id, string $name = 'Name', string $type='type', int $beds=2, int $row=1, int $price=1000): HouseEntity
+    private function makeHouseEntity(int $id, string $name = 'Name', string $type = 'type', int $beds = 2, int $row = 1, int $price = 1000): HouseEntity
     {
         $e = new HouseEntity();
         $e->setName($name)->setType($type)->setBeds($beds)->setRowFromSea($row)->setPricePerNightRub($price);
-        $ref = new \ReflectionClass($e);
+        $ref = new ReflectionClass($e);
         $prop = $ref->getProperty('id');
         $prop->setAccessible(true);
         $prop->setValue($e, $id);

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/squizlabs/php_codesniffer/phpcs.xsd">
+
+    <arg name="basepath" value="."/>
+    <arg name="cache" value=".phpcs-cache"/>
+    <arg name="colors"/>
+    <arg name="extensions" value="php"/>
+
+    <rule ref="PSR12"/>
+
+    <exclude name="Squiz.WhiteSpace.ScopeOpeningBrace"/>
+    <exclude name="Squiz.Functions.MultiLineFunctionDeclaration"/>
+
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="250"/>
+            <property name="absoluteLineLimit" value="0"/>
+        </properties>
+    </rule>
+
+    <rule ref="Generic.Metrics.NestingLevel">
+        <properties>
+            <!-- предупреждение при глубине > 4, ошибка при глубине > 6 -->
+            <property name="nestingLevel" value="4"/>
+            <property name="absoluteNestingLevel" value="6"/>
+        </properties>
+    </rule>
+
+    <exclude-pattern>./vendor/</exclude-pattern>
+    <exclude-pattern>./var/</exclude-pattern>
+
+    <file>./src/</file>
+    <file>./tests/</file>
+
+</ruleset>

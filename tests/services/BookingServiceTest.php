@@ -1,17 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\services;
 
-use App\Services\BookingService;
-use App\Infrastructure\Persistence\BookingRepository;
-use App\Infrastructure\Persistence\UserRepository;
-use App\Infrastructure\Persistence\HouseRepository;
 use App\dto\BookingRequestDto;
 use App\Entity\BookingEntity;
 use App\Entity\HouseEntity;
 use App\Entity\UserEntity;
+use App\Repository\BookingRepository;
+use App\Repository\HouseRepository;
+use App\Repository\UserRepository;
+use App\Services\BookingService;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use RuntimeException;
 
 class BookingServiceTest extends TestCase
@@ -20,7 +23,7 @@ class BookingServiceTest extends TestCase
     {
         $h = new HouseEntity();
         $h->setName('H')->setType('villa')->setBeds(2)->setRowFromSea(1)->setPricePerNightRub(1000);
-        $ref = new \ReflectionClass($h);
+        $ref = new ReflectionClass($h);
         $prop = $ref->getProperty('id');
         $prop->setAccessible(true);
         $prop->setValue($h, $id);
@@ -36,7 +39,7 @@ class BookingServiceTest extends TestCase
     {
         $b = new BookingEntity();
         $b->setHouse($house)->setUser($user)->setComment('c');
-        $ref = new \ReflectionClass($b);
+        $ref = new ReflectionClass($b);
         $prop = $ref->getProperty('id');
         $prop->setAccessible(true);
         $prop->setValue($b, $id);
@@ -69,7 +72,7 @@ class BookingServiceTest extends TestCase
                 return $entity instanceof BookingEntity && $entity->getComment() === 'wow';
             }))
             ->willReturnCallback(function (BookingEntity $e) {
-                $ref = new \ReflectionClass($e);
+                $ref = new ReflectionClass($e);
                 $prop = $ref->getProperty('id');
                 $prop->setAccessible(true);
                 $prop->setValue($e, 55);
@@ -84,7 +87,6 @@ class BookingServiceTest extends TestCase
             comment: 'wow',
             dateFrom: new DateTimeImmutable('2025-06-01'),
             dateTo: new DateTimeImmutable('2025-06-10'),
-            createdAt: new DateTimeImmutable()
         );
 
         $saved = $service->saveBooking($dto);
@@ -103,7 +105,7 @@ class BookingServiceTest extends TestCase
         $bookingRepo->method('isHouseBookedForThePeriod')->willReturn(true);
 
         $service = new BookingService($bookingRepo, $userRepo, $houseRepo);
-        $dto = new BookingRequestDto(id: null, houseId: 1, phone: '+7', comment: null, dateFrom: new DateTimeImmutable('2025-01-01'), dateTo: new DateTimeImmutable('2025-01-02'), createdAt: new DateTimeImmutable());
+        $dto = new BookingRequestDto(id: null, houseId: 1, phone: '+7', comment: null, dateFrom: new DateTimeImmutable('2025-01-01'), dateTo: new DateTimeImmutable('2025-01-02'));
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('House is already booked for the selected period.');
@@ -120,7 +122,7 @@ class BookingServiceTest extends TestCase
         $userRepo->method('findOneBy')->willReturn(null);
 
         $service = new BookingService($bookingRepo, $userRepo, $houseRepo);
-        $dto = new BookingRequestDto(id: null, houseId: 1, phone: '+7', comment: null, dateFrom: new DateTimeImmutable('2025-01-01'), dateTo: new DateTimeImmutable('2025-01-02'), createdAt: new DateTimeImmutable());
+        $dto = new BookingRequestDto(id: null, houseId: 1, phone: '+7', comment: null, dateFrom: new DateTimeImmutable('2025-01-01'), dateTo: new DateTimeImmutable('2025-01-02'));
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('UserEntity with the given phone number does not exist. Please register first.');
@@ -138,7 +140,7 @@ class BookingServiceTest extends TestCase
         $houseRepo->method('find')->willReturn(null);
 
         $service = new BookingService($bookingRepo, $userRepo, $houseRepo);
-        $dto = new BookingRequestDto(id: null, houseId: 1, phone: '+7', comment: null, dateFrom: new DateTimeImmutable('2025-01-01'), dateTo: new DateTimeImmutable('2025-01-02'), createdAt: new DateTimeImmutable());
+        $dto = new BookingRequestDto(id: null, houseId: 1, phone: '+7', comment: null, dateFrom: new DateTimeImmutable('2025-01-01'), dateTo: new DateTimeImmutable('2025-01-02'));
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('HouseEntity with the given ID does not exist.');

@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
-
 use App\dto\BookingRequestDto;
+use App\dto\HouseDto;
 use App\Entity\BookingEntity;
 use App\Entity\HouseEntity;
 use App\Entity\UserEntity;
-use App\Infrastructure\Persistence\BookingRepository;
-use App\Infrastructure\Persistence\HouseRepository;
-use App\Infrastructure\Persistence\UserRepository;
 use App\mappers\BookingMappers;
 use App\mappers\HouseMappers;
+use App\Repository\BookingRepository;
+use App\Repository\HouseRepository;
+use App\Repository\UserRepository;
 use DateTimeImmutable;
 use RuntimeException;
 
@@ -56,16 +58,16 @@ class BookingService
         $this->bookingRepository->remove($booking);
     }
 
-        /**
-        *
-        * @return \App\dto\HouseDto[]
-        */
+    /**
+    *
+    * @return HouseDto[]
+    */
     public function getHousesAvailableForThePeriod(DateTimeImmutable $startDate, DateTimeImmutable $endDate): array
     {
         if ($endDate <= $startDate) {
             throw new RuntimeException('End date must be after start date.');
         }
         $houses = $this->bookingRepository->getHousesAvailableForThePeriod($startDate, $endDate);
-        return array_map(fn(HouseEntity $entity) => HouseMappers::fromEntityToDto($entity), $houses);
+        return array_map(fn (HouseEntity $entity) => HouseMappers::fromEntityToDto($entity), $houses);
     }
 }
