@@ -1,0 +1,55 @@
+name: CI Pipeline
+
+on:
+    push:
+        branches: [ "master" ]
+    pull_request:
+        branches: [ "master" ]
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Install Docker Compose
+              run: |
+                  sudo apt-get update
+                  sudo apt-get install -y curl
+                  sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+                  sudo chmod +x /usr/local/bin/docker-compose
+
+            - name: Load .env.test variables into GitHub Environment
+              run: |
+                  cat .env.test >> $GITHUB_ENV
+
+            - name: Use test env
+              run: |
+                  cp .env.test .env
+
+            - name: Start services
+              run: |
+                  docker-compose up -d --build
+
+            - name: Install Composer dependencies
+              run: |
+                   docker-compose exec -T --user root php bash -lc "git config --global --add safe.directory /var/www/html && composer install --no-interaction --prefer-dist --optimize-autoloader"
+
+            - name: Fix permissions for tests
+              run: |
+                docker-compose exec -T --user root php bash -lc "
+                  mkdir -p var/cache/test var/log &&
+                  chown -R www-data:www-data /var/www/html &&
+                  find var -type d -exec chmod 775 {} \; &&
+                  find var -type f -exec chmod 664 {} \;
+                "
+
+            - name: Run tests
+              run: |
+                docker-compose exec -T --user www-data php bash -lc "APP_ENV=test APP_DEBUG=1 php ./vendor/bin/phpunit --do-not-cache-result tests/api tests/services"
+
+            - name: Stop and remove containers
+              run: |
+                  docker-compose down -v
