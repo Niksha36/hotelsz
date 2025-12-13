@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
-use App\Entity\UserEntity;
+use App\Entity\RefreshTokenEntity;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * @extends ServiceEntityRepository<UserEntity>
- */
-class UserRepository extends ServiceEntityRepository
+class RefreshTokenRepository extends ServiceEntityRepository
 {
     /**
      * @psalm-suppress PossiblyUnusedMethod
@@ -19,13 +16,14 @@ class UserRepository extends ServiceEntityRepository
      */
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, UserEntity::class);
+        parent::__construct($registry, RefreshTokenEntity::class);
     }
 
     /**
+     * @psalm-suppress PossiblyUnusedMethod
      * @psalm-suppress PossiblyUnusedParam
      */
-    public function save(UserEntity $entity, bool $flush = true): void
+    public function save(RefreshTokenEntity $entity, bool $flush = true): void
     {
         $this->getEntityManager()->persist($entity);
 
