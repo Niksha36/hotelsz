@@ -23,12 +23,27 @@ class RefreshTokenRepository extends ServiceEntityRepository
      * @psalm-suppress PossiblyUnusedMethod
      * @psalm-suppress PossiblyUnusedParam
      */
-    public function save(RefreshTokenEntity $entity, bool $flush = true): void
+    public function persist(RefreshTokenEntity $entity): void
     {
         $this->getEntityManager()->persist($entity);
+    }
 
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     * @psalm-suppress PossiblyUnusedParam
+     */
+    public function flush(): void
+    {
+        $this->getEntityManager()->flush();
+    }
+
+    /**
+     * @psalm-suppress PossiblyUnusedMethod
+     * @psalm-suppress PossiblyUnusedParam
+     */
+    public function save(RefreshTokenEntity $entity): void
+    {
+        $this->persist($entity);
+        $this->flush();
     }
 }

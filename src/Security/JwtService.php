@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Security;
 
+use App\TimeConstants;
 use DateInterval;
 use DateTimeImmutable;
 use DomainException;
@@ -26,8 +27,8 @@ class JwtService
         $decoded = base64_decode($jwtSecret, true);
         $this->secret = $decoded !== false ? $decoded : $jwtSecret;
 
-        $this->accessTokenMs = $accessTokenMinutes * 60 * 1000;
-        $this->refreshTokenMs = $refreshTokenDays * 24 * 60 * 60 * 1000;
+        $this->accessTokenMs = $accessTokenMinutes * TimeConstants::SECONDS_IN_A_MINUTE * TimeConstants::MILLISECONDS_IN_A_SECOND;
+        $this->refreshTokenMs = $refreshTokenDays * TimeConstants::HOURS_IN_A_DAY * TimeConstants::MINUTES_IN_AN_HOUR * TimeConstants::SECONDS_IN_A_MINUTE * TimeConstants::MILLISECONDS_IN_A_SECOND;
     }
 
     /**
