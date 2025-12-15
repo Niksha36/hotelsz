@@ -6,7 +6,9 @@ namespace App\Controller;
 
 use App\dto\AvailableHousesRequestDto;
 use App\dto\BookingRequestDto;
+use App\Entity\UserEntity;
 use App\Services\BookingService;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,20 +16,31 @@ use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/booking')]
+#[Route('api/booking')]
 class BookingController extends AbstractController
 {
     private BookingService $bookingService;
+    private LoggerInterface $logger;
 
     public function __construct(
-        BookingService $bookingService
+        BookingService $bookingService,
+        LoggerInterface $logger
     ) {
         $this->bookingService = $bookingService;
+        $this->logger = $logger;
     }
 
     #[Route(methods: ['POST'])]
     public function bookHouse(#[MapRequestPayload] BookingRequestDto $bookingDto): JsonResponse
     {
+        $user = $this->getUser();
+        if (!$user instanceof UserEntity) {
+            $this->logger->error('Unauthenticated user tried to book a house');
+        } else {
+            $userPhone = $user->getPhone();
+            $this->logger->info("User with phone {$userPhone} is booking a house");
+        }
+
         try {
             $savedBookingDto = $this->bookingService->saveBooking($bookingDto);
             return $this->json($savedBookingDto, 201);
@@ -61,7 +74,7 @@ class BookingController extends AbstractController
         }
     }
 
-    #[Route('/booking/available', methods: ['GET'])]
+    #[Route('/available', methods: ['GET'])]
     public function getHousesAvailableForThePeriod(#[MapRequestPayload] AvailableHousesRequestDto $requestDto): JsonResponse
     {
         try {

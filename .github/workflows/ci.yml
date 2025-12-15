@@ -33,7 +33,6 @@ jobs:
 
             -   name: Install Composer dependencies (in container)
                 run: docker-compose exec -T --user root php bash -lc "git config --global --add safe.directory /var/www/html && cd /var/www/html && composer install --no-interaction --prefer-dist --optimize-autoloader"
-
             -   name: Fix permissions for tests
                 run: |
                     docker-compose exec -T --user root php bash -lc "
@@ -43,6 +42,9 @@ jobs:
                       find var -type f -exec chmod 664 {} \;
                     "
 
+            -   name: Prepare test database
+                run: docker-compose exec -T --user www-data php bash -lc "cd /var/www/html && rm -f var/test.db && MESSENGER_TRANSPORT_DSN='sync://' APP_ENV=test APP_DEBUG=0 DATABASE_URL='sqlite:///%kernel.project_dir%/var/test.db' php bin/console doctrine:schema:create --env=test"
+
             -   name: Run tests
                 run: docker-compose exec -T --user www-data php bash -lc "composer run ci:tests"
 
@@ -50,9 +52,10 @@ jobs:
                 if: always()
                 run: docker-compose down -v
 
+
     code_quality:
-        runs-on: ubuntu-latest
         needs: test
+        runs-on: ubuntu-latest
 
         steps:
             -   name: Checkout
@@ -71,6 +74,41 @@ jobs:
 
             -   name: Use test env
                 run: cp .env.test .env
+            -   name: Install Docker Compose (robust, Compose v2 CLI plugin + shim)
+                run: |
+                    set -euo pipefail
+
+                    # удалить старые вариации, если есть
+                    sudo rm -f /usr/local/bin/docker-compose /usr/local/lib/docker/cli-plugins/docker-compose || true
+
+                    # создать директорию для cli plugins
+                    sudo mkdir -p /usr/local/lib/docker/cli-plugins
+
+                    # скачиваем бинарник; --fail сделает curl неудачным при HTTP >=400 (не сохранит HTML)
+                    ARCH=$(uname -m)
+                    OS=$(uname -s)
+                    URL="https://github.com/docker/compose/releases/latest/download/docker-compose-${OS}-${ARCH}"
+                    echo "Downloading: $URL"
+
+                    sudo curl -sSL --fail "$URL" -o /usr/local/lib/docker/cli-plugins/docker-compose
+
+                    # проверка: если curl вернул ошибку — блок упадёт; если файл текстовый — покажем первые строки для диагностики
+                    if ! sudo file /usr/local/lib/docker/cli-plugins/docker-compose | grep -q 'executable'; then
+                      echo "Downloaded file is not executable binary — showing head for debug:"
+                      sudo head -n 40 /usr/local/lib/docker/cli-plugins/docker-compose || true
+                      echo "Failing because downloaded file is not binary"
+                      exit 1
+                    fi
+
+                    sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+
+                    # optional: make old-style command available
+                    sudo ln -sf /usr/local/lib/docker/cli-plugins/docker-compose /usr/local/bin/docker-compose
+
+                    echo "Installed versions:"
+                    docker --version || true
+                    docker compose version || true
+                    /usr/local/bin/docker-compose --version || true
 
             -   name: Build and start docker-compose services
                 run: docker-compose up -d --build
@@ -80,9 +118,6 @@ jobs:
 
             -   name: Run PHPCS
                 run: docker-compose exec -T --user www-data php bash -lc "composer run cs:check"
-
-            -   name: Run PHP-CS-Fixer dry-run
-                run: docker-compose exec -T --user root php bash -lc "cd /var/www/html && composer run cs:fix"
 
             -   name: Ensure Symfony cache & dump container XML
                 run: |

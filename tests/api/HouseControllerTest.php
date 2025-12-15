@@ -5,15 +5,19 @@ declare(strict_types=1);
 namespace App\Tests\api;
 
 use App\dto\HouseDto;
+use App\Security\UserRole;
 use App\Services\HouseService;
+use App\Tests\api\TestHelpers\AuthenticatedClientTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
 class HouseControllerTest extends WebTestCase
 {
+    use AuthenticatedClientTrait;
+
     public function testPutHouse(): void
     {
-        $client = static::createClient();
+        $client = $this->createAuthenticatedClient(UserRole::ROLE_ADMIN);
 
         $houseData = [
             'name' => 'Villa on the beach',
@@ -52,7 +56,7 @@ class HouseControllerTest extends WebTestCase
 
         $client->request(
             'POST',
-            '/houses',
+            'api/admin/houses',
             [],
             [],
             ['CONTENT_TYPE' => 'application/json'],
@@ -76,7 +80,7 @@ class HouseControllerTest extends WebTestCase
 
     public function testGetHouses(): void
     {
-        $client = static::createClient();
+        $client = $this->createAuthenticatedClient();
 
         $houseServiceMock = $this->createMock(HouseService::class);
 
@@ -91,7 +95,7 @@ class HouseControllerTest extends WebTestCase
 
         static::getContainer()->set(HouseService::class, $houseServiceMock);
 
-        $client->request('GET', '/houses');
+        $client->request('GET', 'api/houses');
 
         $this->assertResponseIsSuccessful();
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);

@@ -22,3 +22,4 @@ assets/csv/*
 ###> squizlabs/php_codesniffer ###
 /.phpcs-cache
 ###< squizlabs/php_codesniffer ###
+.php-cs-fixer.cache
