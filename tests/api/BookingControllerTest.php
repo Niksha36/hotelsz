@@ -7,6 +7,7 @@ namespace App\Tests\api;
 use App\dto\BookingRequestDto;
 use App\dto\HouseDto;
 use App\Services\BookingService;
+use App\Tests\api\TestHelpers\AuthenticatedClientTrait;
 use DateTimeImmutable;
 use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -14,9 +15,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class BookingControllerTest extends WebTestCase
 {
+    use AuthenticatedClientTrait;
+
     public function testBookHouseSuccess(): void
     {
-        $client = static::createClient();
+        $client = $this->createAuthenticatedClient();
 
         $bookingServiceMock = $this->createMock(BookingService::class);
         static::getContainer()->set(BookingService::class, $bookingServiceMock);
@@ -49,7 +52,7 @@ class BookingControllerTest extends WebTestCase
             }))
             ->willReturn($expectedDto);
 
-        $client->request('POST', '/booking', [], [], ['CONTENT_TYPE' => 'application/json'], json_encode($requestData));
+        $client->request('POST', 'api/booking', [], [], ['CONTENT_TYPE' => 'application/json'], json_encode($requestData));
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
         $responseData = json_decode($client->getResponse()->getContent(), true);
@@ -61,7 +64,7 @@ class BookingControllerTest extends WebTestCase
 
     public function testBookHouseRuntimeException(): void
     {
-        $client = static::createClient();
+        $client = $this->createAuthenticatedClient();
 
         $bookingServiceMock = $this->createMock(BookingService::class);
         static::getContainer()->set(BookingService::class, $bookingServiceMock);
@@ -78,7 +81,7 @@ class BookingControllerTest extends WebTestCase
             ->method('saveBooking')
             ->willThrowException(new RuntimeException('House is already booked for the selected period.'));
 
-        $client->request('POST', '/booking', [], [], ['CONTENT_TYPE' => 'application/json'], json_encode($requestData));
+        $client->request('POST', 'api/booking', [], [], ['CONTENT_TYPE' => 'application/json'], json_encode($requestData));
 
         $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
         $content = $client->getResponse()->getContent();
@@ -87,7 +90,7 @@ class BookingControllerTest extends WebTestCase
 
     public function testUpdateBookingSuccess(): void
     {
-        $client = static::createClient();
+        $client = $this->createAuthenticatedClient();
 
         $bookingServiceMock = $this->createMock(BookingService::class);
         static::getContainer()->set(BookingService::class, $bookingServiceMock);
@@ -119,7 +122,7 @@ class BookingControllerTest extends WebTestCase
             }))
             ->willReturn($expectedDto);
 
-        $client->request('PUT', '/booking/' . $requestData['id'], [], [], ['CONTENT_TYPE' => 'application/json'], json_encode($requestData));
+        $client->request('PUT', 'api/booking/' . $requestData['id'], [], [], ['CONTENT_TYPE' => 'application/json'], json_encode($requestData));
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
         $responseData = json_decode($client->getResponse()->getContent(), true);
@@ -129,7 +132,7 @@ class BookingControllerTest extends WebTestCase
 
     public function testUpdateBookingIdMismatch(): void
     {
-        $client = static::createClient();
+        $client = $this->createAuthenticatedClient();
 
         $bookingServiceMock = $this->createMock(BookingService::class);
         static::getContainer()->set(BookingService::class, $bookingServiceMock);
@@ -145,7 +148,7 @@ class BookingControllerTest extends WebTestCase
 
         $bookingServiceMock->expects($this->never())->method('saveBooking');
 
-        $client->request('PUT', '/booking/9', [], [], ['CONTENT_TYPE' => 'application/json'], json_encode($requestData));
+        $client->request('PUT', 'api/booking/9', [], [], ['CONTENT_TYPE' => 'application/json'], json_encode($requestData));
 
         $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
         $content = $client->getResponse()->getContent();
@@ -154,7 +157,7 @@ class BookingControllerTest extends WebTestCase
 
     public function testDeleteBookingSuccess(): void
     {
-        $client = static::createClient();
+        $client = $this->createAuthenticatedClient();
 
         $bookingServiceMock = $this->createMock(BookingService::class);
         static::getContainer()->set(BookingService::class, $bookingServiceMock);
@@ -163,7 +166,7 @@ class BookingControllerTest extends WebTestCase
             ->method('deleteBooking')
             ->with(15);
 
-        $client->request('DELETE', '/booking/15');
+        $client->request('DELETE', 'api/booking/15');
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
         $responseData = json_decode($client->getResponse()->getContent(), true);
@@ -172,7 +175,7 @@ class BookingControllerTest extends WebTestCase
 
     public function testDeleteBookingRuntimeException(): void
     {
-        $client = static::createClient();
+        $client = $this->createAuthenticatedClient();
 
         $bookingServiceMock = $this->createMock(BookingService::class);
         static::getContainer()->set(BookingService::class, $bookingServiceMock);
@@ -182,7 +185,7 @@ class BookingControllerTest extends WebTestCase
             ->with(99)
             ->willThrowException(new RuntimeException('Booking not found.'));
 
-        $client->request('DELETE', '/booking/99');
+        $client->request('DELETE', 'api/booking/99');
 
         $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
         $content = $client->getResponse()->getContent();
@@ -191,7 +194,7 @@ class BookingControllerTest extends WebTestCase
 
     public function testGetAvailableHousesSuccess(): void
     {
-        $client = static::createClient();
+        $client = $this->createAuthenticatedClient();
 
         $bookingServiceMock = $this->createMock(BookingService::class);
         static::getContainer()->set(BookingService::class, $bookingServiceMock);
@@ -214,7 +217,7 @@ class BookingControllerTest extends WebTestCase
 
         $client->request(
             'GET',
-            '/booking/booking/available',
+            'api/booking/available',
             [],
             [],
             ['CONTENT_TYPE' => 'application/json'],
@@ -233,7 +236,7 @@ class BookingControllerTest extends WebTestCase
 
     public function testGetAvailableHousesRuntimeException(): void
     {
-        $client = static::createClient();
+        $client = $this->createAuthenticatedClient();
 
         $bookingServiceMock = $this->createMock(BookingService::class);
         static::getContainer()->set(BookingService::class, $bookingServiceMock);
@@ -247,7 +250,7 @@ class BookingControllerTest extends WebTestCase
 
         $client->request(
             'GET',
-            '/booking/booking/available',
+            'api/booking/available',
             [],
             [],
             ['CONTENT_TYPE' => 'application/json'],
